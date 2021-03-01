@@ -37,16 +37,18 @@ month_days_mapping = dict({
 })
 
 #Get first and last day of the month
-actual_date = datetime.today().date()
-if len(str(actual_date.month)) == 1:
-    first_day_month = "0{}/{}/{}".format(actual_date.month, "01", actual_date.year)
-    last_day_month = "0{}/{}/{}".format(actual_date.month, month_days_mapping.get(str(actual_date.month)), actual_date.year)
+today = datetime.today().date()
+if today.day < 10:
+    today = today.replace(month=today.month-1)
+if len(str(today.month)) == 1:
+    first_day_month = "0{}/{}/{}".format(today.month, "01", today.year)
+    last_day_month = "0{}/{}/{}".format(today.month, month_days_mapping.get(str(today.month)), today.year)
 else:
-    first_day_month = "{}/{}/{}".format(actual_date.month, "01", actual_date.year)
-    last_day_month = "{}/{}/{}".format(actual_date.month, month_days_mapping.get(str(actual_date.month)), actual_date.year)
+    first_day_month = "{}/{}/{}".format(today.month, "01", today.year)
+    last_day_month = "{}/{}/{}".format(today.month, month_days_mapping.get(str(today.month)), today.year)
 
 #Get the webpage
-driver = webdriver.Chrome("C:\Program Files (x86)\chromedriver")
+driver = webdriver.Chrome('C:\Program Files (x86)\chromedriver')
 
 #Login to Spotify
 driver.get("https://spotlistr.com/.netlify/functions/routes/login")
@@ -56,7 +58,7 @@ login_button = driver.find_element_by_id("login-button")
 username.send_keys(secret_username)
 password.send_keys(secret_password)
 login_button.click()
-time.sleep(3)
+time.sleep(4)
 driver.get("https://www.spotlistr.com/search/lastfm-top-for-time-period")
 
 #Select time period
@@ -69,12 +71,14 @@ end_date.send_keys(last_day_month)
 track_number = driver.find_elements_by_class_name("ui input")[3]
 track_number.clear()
 track_number.send_keys("20")
-search = driver.find_element_by_xpath('//*[@id="__next"]/div[1]/div[2]/div[2]/div[2]/div/div/div/form[1]/div/div[4]/div/div/button')
+search = driver.find_element_by_xpath('/html/body/div[1]/div[1]/div[2]/div[2]/div[2]/div/div/div/form[1]/div/div[4]/div/div/button')
 search.click()
 
 #Name and create the playlist
 time.sleep(5)
-playlist_name = driver.find_element_by_xpath('//*[@id="__next"]/div[1]/div[2]/div[2]/div[2]/div/div/div/form[2]/div[2]/div[1]/div/input')
-playlist_name.send_keys("Preferiti di {} {}".format(month_mapping.get(str(actual_date.month)), str(actual_date.year)))
-create_playlist = driver.find_element_by_xpath('//*[@id="__next"]/div[1]/div[2]/div[2]/div[2]/div/div/div/form[2]/div[3]/div/button[1]')
+playlist_name = driver.find_element_by_xpath('/html/body/div[1]/div[1]/div[2]/div[2]/div[2]/div/div/div/form[2]/div[2]/div[1]/div/input')
+playlist_name.send_keys("Preferiti di {} {}".format(month_mapping.get(str(today.month)), str(today.year)))
+create_playlist = driver.find_element_by_xpath('/html/body/div[1]/div[1]/div[2]/div[2]/div[2]/div/div/div/form[2]/div[3]/div/button[1]')
 create_playlist.click()
+time.sleep(2)
+driver.quit()
